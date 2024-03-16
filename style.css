@@ -1,0 +1,93 @@
+:root {
+    color-scheme: light dark;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+.instruction>li {
+    margin: 50px 0;
+}
+
+.get-article-wrap {
+    max-width: 600px;
+    display: flex;
+    justify-content: space-between;
+    margin-right: 40px;
+}
+
+.article-url {
+    width: 100%;
+    margin-right: 5px;
+}
+
+#get-mlt {
+    white-space: nowrap;
+}
+
+.article-name {
+    font-weight: bold;
+}
+
+.err {
+    color: #ff6666;
+}
+
+.mlt {
+    border-collapse: collapse;
+    border: 2px solid;
+}
+
+.mlt td {
+    border: 1px solid;
+}
+
+.mlt-img {
+    width: 80px;
+    height: 80px;
+}
+
+.mlt-img>img {
+    width: 50%;
+    height: 50%;
+    display: block;
+    margin: auto;
+    filter: invert(47%) sepia(15%) saturate(174%) hue-rotate(172deg) brightness(94%) contrast(86%);
+}
+
+.mlt-text {
+    min-width: 140px;
+    padding: 0 10px;
+}
+
+.mlt-name {
+    font-weight: bold;
+}
+
+.mlt-desc {
+    display: inline-block;
+    vertical-align: bottom;
+    color: gray;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 400px;
+}
+
+.copyarea {
+    display: flex;
+    justify-content: space-between;
+    max-width: 600px;
+    margin-right: 40px;
+}
+
+.copy-text {
+    width: 100%;
+    margin-right: 5px;
+    resize: vertical;
+}
+
+#copy-btn {
+    vertical-align: top;
+}
