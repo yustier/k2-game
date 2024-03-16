@@ -6,6 +6,11 @@ h1, h2 {
     text-align: center;
 }
 
+form[name="select-game"] {
+    display: flex;
+    justify-content: center;
+}
+
 .instruction>li {
     margin: 50px 0;
 }
@@ -17,12 +22,12 @@ h1, h2 {
     margin-right: 40px;
 }
 
-.article-url {
+#article-url {
     width: 100%;
     margin-right: 5px;
 }
 
-#get-mlt {
+#get-mlt-btn {
     white-space: nowrap;
 }
 

@@ -11,16 +11,22 @@
 <body>
     <h1>K2ゲーム</h1>
     <h2>出題ヘルパー</h2>
+    <form name="select-game">
+        <input type="radio" name="game" value="k2" id="k2" checked>
+        <label for="k2">K2ゲーム</label>
+        <input type="radio" name="game" value="image-quiz" id="image-quiz">
+        <label for="image">Wikipediaの参考画像から何の記事を当てるかクイズ</label>
+    </form>
     <ol class="instruction">
-        <li><p>MediaWikiの記事のリンクを貼ってください:</p>
-        <form name="get-article">
-            <div class="get-article-wrap">
-                <input class="article-url" type="text" name="url" placeholder="https://ja.wikipedia.org/wiki/特別:おまかせ表示">
-                <button id="get-mlt">関連ページを取得</button>
-            </div>
-        </form>
+        <li>
+            <p>MediaWikiの記事のリンクを貼ってください:</p>
+            <form class="get-article-wrap" name="get-mlt" action="" method="get">
+                <input id="article-url" type="url" name="u" value="" placeholder="https://ja.wikipedia.org/wiki/特別:おまかせ表示">
+                <input type="submit" id="get-mlt-btn" value="関連ページを取得">
+            </form>
         </li>
-        <li><p><span class="article-name">当該記事</span> の関連ページは以下のとおりです:</p>
+        <li class="k2">
+            <p><span class="article-name">当該記事</span> の関連ページは以下のとおりです:</p>
             <p class="err">エラーのサンプル</p>
             <table class="mlt">
                 <tr>
@@ -45,6 +51,9 @@
                     </td>
                 </tr>
             </table>
+        </li>
+        <li class="image-quiz">
+            <p><span class="article-name">当該記事</span> に含まれる画像一覧は以下のとおりです:</p>
         </li>
         <li>
             <p>上の問題の正解は以下のうちのどれか及びそれらの表記ゆれです:</p>
