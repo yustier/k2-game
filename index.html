@@ -2,77 +2,135 @@
 <html lang="ja">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K2ゲーム</title>
-    <link rel="stylesheet" href="style.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>K2ゲーム</title>
+	<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <h1>K2ゲーム</h1>
-    <h2>出題ヘルパー</h2>
-    <form name="select-game">
-        <input type="radio" name="game" value="k2" id="k2" checked>
-        <label for="k2">K2ゲーム</label>
-        <input type="radio" name="game" value="image-quiz" id="image-quiz">
-        <label for="image">Wikipediaの参考画像から何の記事を当てるかクイズ</label>
-    </form>
-    <ol class="instruction">
-        <li>
-            <p>MediaWikiの記事のリンクを貼ってください:</p>
-            <form class="get-article-wrap" name="get-mlt" action="" method="get">
-                <input id="article-url" type="url" name="u" value="" placeholder="https://ja.wikipedia.org/wiki/特別:おまかせ表示">
-                <input type="submit" id="get-mlt-btn" value="関連ページを取得">
-            </form>
-        </li>
-        <li class="k2">
-            <p><span class="article-name">当該記事</span> の関連ページは以下のとおりです:</p>
-            <p class="err">エラーのサンプル</p>
-            <table class="mlt">
-                <tr>
-                    <td class="mlt-img"><img src="noimage.svg"></td>
-                    <td class="mlt-text">
-                        <span class="mlt-name">関連ページA</span><br>
-                        <span class="mlt-desc">関連ページAの説明</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="mlt-img"><img src="noimage.svg"></td>
-                    <td class="mlt-text">
-                        <span class="mlt-name">関連ページB</span><br>
-                        <span class="mlt-desc">関連ページBの説明</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="mlt-img"><img src="noimage.svg"></td>
-                    <td class="mlt-text">
-                        <span class="mlt-name">関連ページC</span><br>
-                        <span class="mlt-desc">関連ページCの説明</span>
-                    </td>
-                </tr>
-            </table>
-        </li>
-        <li class="image-quiz">
-            <p><span class="article-name">当該記事</span> に含まれる画像一覧は以下のとおりです:</p>
-        </li>
-        <li>
-            <p>上の問題の正解は以下のうちのどれか及びそれらの表記ゆれです:</p>
-            <ul class="answers"></ul>
-            <p>タップするとコピー欄に解答が追加されます</p>
-            <div class="copyarea">
-                <textarea class="copy-text" name="copy"></textarea>
-                <button id="copy-btn">クリップボードにコピー</button>
-            </div>
-        </li>
-    </ol>
+	<header>
+		<h1>K2ゲームヘルパー</h1>
+	</header>
+	<fieldset class="rules">
+		<legend><h2>ルール</h2></legend>
+		<details id="rules-details">
+			<summary></summary>
+			<blockquote cite="https://gist.github.com/yustier/0fc1407a02c622d5afbbf579c311ee7f">
+				<ol>
+					<li><p>
+						<b>出題者</b>はいつものように Wikipedia サーフィンをするついでに記事の関連ページの欄を眺め, 面白い出題になりそうな記事があったら<sup><a href="#fn1" id="r1">[1]</a></sup>その関連ページのスクリーンショットをチャットに貼り付ける. 貼り付けられた時点で残りの参加者は<b>解答者</b>となる.
+					</p></li>
+					<li><p>
+						解答者は, その関連ページを持つ記事の名前を推測し, チャットに書き込む. この間, K2ゲームを解くために Wikipedia を閲覧したり, ウェブ検索エンジンを使用したり<b>してはならない</b><sup><a href="#fn2" id="r2">[2]</a></sup>.
+					</p></li>
+					<li><p>
+						出題者は解答者の回答を確認し, 正解か不正解かを伝える<sup><a href="#fn3" id="r3">[3]</a></sup><sup><a href="#fn4" id="r4">[4]</a></sup>. 最も早く正解した解答者が勝者となる.
+					</p></li>
+				</ol>
+				<h3>脚注</h3>
+				<ol class="footnotes">
+					<li id="fn1"><p><b><a class="fn-marker" href="#r1">^</a></b>
+						ランダムな記事 (<a href="https://ja.wikipedia.org/wiki/特別:おまかせ表示">https://ja.wikipedia.org/wiki/特別:おまかせ表示</a>) を開いてもよいが, 大抵面白くない出題になるため, 普段の Wikipedia サーフィンの最中に見つけた面白い関連ページから出題することを推奨する.
+					</p></li>
+					<li id="fn2"><p><b><a class="fn-marker" href="#r2">^</a></b>
+						関連ページに表示される 3 つの記事の閲覧のみを禁止する流派もある.
+					</p></li>
+					<li id="fn3"><p><b><a class="fn-marker" href="#r3">^</a></b>
+						当該記事への<b>リダイレクトページ</b>の名前も正解とする. 当該記事の節へのリダイレクトは不正解とする. また, 表記ゆれの範疇である解答も正解とする.
+					</p></li>
+					<li id="fn4"><p><b><a class="fn-marker" href="#r4">^</a></b>
+						なかなか正答が出ない場合は「惜しい」や「〇〇は関係ない」のようにヒントを出してもよい.
+					</p></li>
+				</ol>
+				<p class="cite">— <cite><a href="https://gist.github.com/yustier/0fc1407a02c622d5afbbf579c311ee7f">K2ゲーム - GitHub Gist</a></cite></p>
+			</blockquote>
+		</details>
+	</fieldset>
+	<fieldset class="config-wrap">
+		<legend><h3>動作モード設定</h3></legend>
+		<form class="form-config" name="select-mode">
+			<div>
+				<label for="set">出題する</label>
+				<input type="radio" name="mode" value="set" id="set" checked>
+			</div>
+			<div>
+				<label for="play">遊ぶ</label>
+				<input type="radio" name="mode" value="play" id="play">
+			</div>
+		</form>
+		<form class="form-config" name="select-game">
+			<div>
+				<label for="k2">K2ゲーム</label>
+				<input type="radio" name="game" value="k2" id="k2" checked>
+			</div>
+			<div>
+				<label for="image-quiz">Wikipediaの参考画像から何の記事を当てるかクイズ</label>
+				<input type="radio" name="game" value="image-quiz" id="image-quiz">
+			</div>
+		</form>
+	</fieldset>
+	<h2 id="no-js">JavaScriptを有効にしてください</h2>
+	<ol class="app" hidden>
+		<li id="set-article">
+			<p>MediaWikiの記事のリンクを貼ってください:</p>
+			<form class="get-article-wrap" name="get-mlt" action="" method="get">
+				<input id="article-url" type="url" name="u" value="" placeholder="https://ja.wikipedia.org/wiki/特別:おまかせ表示">
+				<input type="submit" id="get-mlt-btn" value="関連ページを取得">
+			</form>
+		</li>
+		<li id="set-quiz-auto">
+			<p>ボタンを押すと問題を選び直します.</p>
+			<p>出題範囲は <a href="https://ja.wikipedia.org/wiki/特別:おまかせ表示">特別:おまかせ表示 - Wikipedia</a> です.</p>
+			<input type="button" id="set-quiz-btn" value="問題を選び直す">
+		</li>
+		<li id="quiz-k2">
+			<p><span class="article-name">当該記事</span> の関連ページは以下のとおりです:</p>
+			<table id="mlt"></table>
+		</li>
+		<li id="quiz-image-quiz">
+			<p><span class="article-name">当該記事</span> に含まれる画像一覧は以下のとおりです:</p>
+		</li>
+		<li id="guess-area">
+			<p><b>問題.</b>&emsp;この記事の名前はなんでしょう?</p>
+			<form class="guess" name="guess">
+				<label for="guess-input">解答欄:</label>
+				<input id="guess-input" type="text" name="guess" value="" placeholder="答えを入力してください">
+				<input type="button" id="guess-btn" value="答え合わせ">
+			</form>
+			<p class="err">誤答のメッセージ</p>
+			<p class="good">正解のメッセージ</p>
+			<p><b>注意.</b>&emsp;このアプリを使ってK2ゲームを遊ぶ場合,</p>
+			<ul>
+				<li><p>他の解答者の誤答の履歴を見ることはできません.</p></li>
+				<li><p>リダイレクトにない表記揺れを正解として判定できません.</p></li>
+				<li><p>技術的な制約から, <code>_</code> (アンダースコア) と半角スペースを区別しません.</p></li>
+			</ul>
+		</li>
+		<li id="answer-area">
+			<p>上の問題の正解は以下のうちのどれか及びそれらの表記ゆれです:</p>
+			<ul id="answers"></ul>
+			<div class="copyarea">
+				<textarea id="copy-answer" class="copy-text" name="copy"></textarea>
+				<button id="copy-answer-btn">クリップボードにコピー</button>
+			</div>
+			<p id="copy-answer-result"></p>
+			<p>この問題を遊ぶリンク:</p>
+			<div class="copyarea">
+				<input id="copy-link" class="copy-text" type="text" disabled>
+				<button id="copy-link-btn">クリップボードにコピー</button>
+			</div>
+			<p id="copy-link-result"></p>
+		</li>
+	</ol>
 
-    <hr>
-    <div id="footer">
-        ©2024 <a href="https://i6c.at">Airoku</a><br>
-        <a href="https://github.com/yustier/k2-game">Source</a>
-    </div>
+	<hr>
+	<footer>
+		©2024, 2025 <a href="https://i6c.at">Airoku</a><br>
+		<a href="https://github.com/yustier/k2-game">Source</a>
+	</footer>
 
-    <script src="main.js"></script>
+	<script src="main.js"></script>
 </body>
 
 </html>

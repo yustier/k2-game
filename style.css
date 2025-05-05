@@ -1,17 +1,85 @@
 :root {
     color-scheme: light dark;
+    --bg-1: light-dark(#fff, #121212);
+    --bg-2: light-dark(#ccc, #282828);
+    --text-muted: light-dark(#666, #888);
+    --text-red: light-dark(#e44, #f66);
+    --text-green: light-dark(#0a0, #6f6);
 }
 
 h1, h2 {
     text-align: center;
 }
 
-form[name="select-game"] {
-    display: flex;
-    justify-content: center;
+fieldset {
+    margin: 2em auto;
+    width: fit-content;
 }
 
-.instruction>li {
+legend {
+    text-align: center;
+    padding: 0 1em;
+}
+
+legend h2, legend h3 {
+    margin: 0;
+}
+
+.rules {
+    max-width: max(600px, 80vw);
+}
+
+.rules summary {
+    text-align: center;
+    background-color: var(--bg-2);
+    padding: 0.3em;
+    cursor: pointer;
+}
+
+.rules summary::marker {
+    font-weight: bold;
+    content: 'ひらく';
+}
+
+.rules details[open] summary::marker {
+    content: 'たたむ';
+}
+
+.footnotes {
+    font-size: 0.85em;
+}
+
+.cite {
+    text-align: right;
+}
+
+.form-config {
+    display: flex;
+    justify-content: center;
+    margin: 0.5em auto;
+}
+
+.form-config>div {
+    margin: 0.2em;
+    padding: 0.5em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2em;
+    background-color: var(--bg-2);
+}
+
+.form-config input {
+    height: 2em;
+    min-width: 2em;
+    width: -webkit-fill-available;
+}
+
+.form-config label, .form-config input {
+    cursor: pointer;
+}
+
+.app>li {
     margin: 50px 0;
 }
 
@@ -36,15 +104,19 @@ form[name="select-game"] {
 }
 
 .err {
-    color: #ff6666;
+    color: var(--text-red);
 }
 
-.mlt {
+.good {
+    color: var(--text-green);
+}
+
+#mlt {
     border-collapse: collapse;
     border: 2px solid;
 }
 
-.mlt td {
+#mlt td {
     border: 1px solid;
 }
 
@@ -54,11 +126,16 @@ form[name="select-game"] {
 }
 
 .mlt-img>img {
-    width: 50%;
-    height: 50%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     display: block;
     margin: auto;
-    filter: invert(47%) sepia(15%) saturate(174%) hue-rotate(172deg) brightness(94%) contrast(86%);
+}
+
+.mlt-img>img.noimage {
+    width: 50%;
+    height: 50%;
 }
 
 .mlt-text {
@@ -71,13 +148,19 @@ form[name="select-game"] {
 }
 
 .mlt-desc {
+    margin-top: 0.2em;
+    font-size: 0.9em;
     display: inline-block;
     vertical-align: bottom;
-    color: gray;
+    color: var(--text-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 400px;
+}
+
+#answers {
+    margin: 1em;
 }
 
 .copyarea {
