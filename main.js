@@ -337,7 +337,7 @@ async function writeAnswers() {
 async function init() {
 	document.forms['select-mode'].addEventListener('change', updateShownParts);
 	document.forms['select-game'].addEventListener('change', updateShownParts);
-	document.querySelector('#get-mlt-btn').addEventListener('click', (e) => {
+	document.querySelector('#set-article-btn').addEventListener('click', (e) => {
 		e.preventDefault();
 		updateArticleUrl();
 	});
