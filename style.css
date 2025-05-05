@@ -70,8 +70,8 @@ legend h2, legend h3 {
 }
 
 .form-config input {
-    height: 2em;
-    min-width: 2em;
+    height: 1.5em;
+    min-width: 1.5em;
     width: -webkit-fill-available;
 }
 
