@@ -25,8 +25,12 @@ function setArticleUrl(url) {
 	}
 }
 
-function updateArticleUrl() {
+async function updateArticleUrl() {
 	const articleUrl = document.querySelector('#article-url');
+	if (!articleUrl.value) {
+		// random page
+		articleUrl.value = await queryMediaWikiAPIRandom();
+	}
 	const url = articleUrl.value || articleUrl.placeholder;
 	thisParams.set('u', url);
 	location.href = thisUrlBase + '?' + thisParams.toString();
@@ -76,7 +80,7 @@ function getTime() {
 // MARK: Queries
 
 async function queryMediaWikiAPIRandom() {
-	// MediaWiki API を呼び出して, ランダムなページの名前を1つ取得する.
+	// MediaWiki API を呼び出して, ランダムなページのURLを1つ取得する.
 	// 詳細: https://www.mediawiki.org/wiki/API:Random
 	const requestParams = {
 		origin: '*',
@@ -95,7 +99,7 @@ async function queryMediaWikiAPIRandom() {
 	const response = await fetch(apiUrl + '?' + new URLSearchParams(requestParams));
 	const data = await response.json();
 	const pageTitle = data.query.random[0].title;
-	return pageTitle;
+	return `https://${domain}/wiki/${pageTitle}`;
 }
 
 async function queryMediaWikiAPIPagename(curid) {
@@ -236,6 +240,17 @@ async function queryMediaWikiAPIImageList() {
 
 // MARK: Async
 
+async function setArticleUrlByTitle() {
+	const articleUrl = document.querySelector('#article-url');
+	if (new URL(thisU).searchParams.has('curid')) {
+		const curid = new URL(thisU).searchParams.get('curid');
+		const pageTitle = await queryMediaWikiAPIPagename(curid);
+		setArticleUrl(new URL(thisU).origin + '/wiki/' + pageTitle);
+	} else {
+		setArticleUrl(thisU);
+	}
+}
+
 async function getArticleTitle() {
 	const data = await window.mediaWikiAPIResponseRedirects;
 	return data.query.pages[Object.keys(data.query.pages)[0]].title;
@@ -366,10 +381,9 @@ async function init() {
 	});
 	document.querySelector('#reroll-article-btn').addEventListener('click', async (e) => {
 		e.preventDefault();
-		const randomPageTitle = await queryMediaWikiAPIRandom();
+		const randomPageURL = await queryMediaWikiAPIRandom();
 		const articleUrl = document.querySelector('#article-url');
-		const domain = new URL('https://ja.wikipedia.org/').origin;
-		setArticleUrl(domain + '/wiki/' + randomPageTitle);
+		setArticleUrl(randomPageURL);
 		updateArticleUrl();
 	});
 	document.querySelector('#copy-answer-btn').addEventListener('click', (e) => {
@@ -398,11 +412,17 @@ async function init() {
 	});
 
 	restoreRulesOpenState();
-	setArticleUrl();
 	document.querySelector('#no-js').setAttribute('hidden', true);
 
+	if (!thisU) {
+		showMainApp();
+		return;
+	}
+
+	await setArticleUrlByTitle();
+
 	showMainApp(); // 開発中はここで表示しておく
-	return; // コード編集前にreturnせよ
+	// return; // コード編集前にreturnせよ
 
 	// ここまではクエリしなくてよい操作
 	window.mediaWikiAPIResponseMlt = await queryMediaWikiAPIMlt();
