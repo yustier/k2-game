@@ -63,8 +63,8 @@ function showMainApp() {
 	document.querySelector('.app').removeAttribute('hidden');
 }
 
-// 現在の HH:mm:ss:sss を取得する
 function getTime() {
+	// エラーメッセージに時間を表示するのに使う.
 	const now = new Date();
 	const h = String(now.getHours()).padStart(2, '0');
 	const m = String(now.getMinutes()).padStart(2, '0');
@@ -74,6 +74,29 @@ function getTime() {
 }
 
 // MARK: Queries
+
+async function queryMediaWikiAPIRandom() {
+	// MediaWiki API を呼び出して, ランダムなページの名前を1つ取得する.
+	// 詳細: https://www.mediawiki.org/wiki/API:Random
+	const requestParams = {
+		origin: '*',
+		format: 'json',
+
+		action: 'query',
+			list: 'random',
+				rnnamespace: 0,
+				rnlimit: 1,
+	};
+
+	const targetUrl = new URL('https://ja.wikipedia.org/');
+	const domain = targetUrl.hostname;
+	const apiUrl = `https://${domain}/w/api.php`;
+
+	const response = await fetch(apiUrl + '?' + new URLSearchParams(requestParams));
+	const data = await response.json();
+	const pageTitle = data.query.random[0].title;
+	return pageTitle;
+}
 
 async function queryMediaWikiAPIPagename(curid) {
 	// curid (pageId) からページ名を取得する.
@@ -339,6 +362,14 @@ async function init() {
 	document.forms['select-game'].addEventListener('change', updateShownParts);
 	document.querySelector('#set-article-btn').addEventListener('click', (e) => {
 		e.preventDefault();
+		updateArticleUrl();
+	});
+	document.querySelector('#reroll-article-btn').addEventListener('click', async (e) => {
+		e.preventDefault();
+		const randomPageTitle = await queryMediaWikiAPIRandom();
+		const articleUrl = document.querySelector('#article-url');
+		const domain = new URL('https://ja.wikipedia.org/').origin;
+		setArticleUrl(domain + '/wiki/' + randomPageTitle);
 		updateArticleUrl();
 	});
 	document.querySelector('#copy-answer-btn').addEventListener('click', (e) => {
