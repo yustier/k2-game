@@ -375,6 +375,7 @@ async function writeAnswers() {
 async function init() {
 	document.forms['select-mode'].addEventListener('change', updateShownParts);
 	document.forms['select-game'].addEventListener('change', updateShownParts);
+
 	document.querySelector('#set-article-btn').addEventListener('click', (e) => {
 		e.preventDefault();
 		updateArticleUrl();
@@ -386,6 +387,51 @@ async function init() {
 		setArticleUrl(randomPageURL);
 		updateArticleUrl();
 	});
+
+	document.querySelector('#show-next-image-btn').addEventListener('click', async (e) => {
+		const showNextImageBtn = document.querySelector('#show-next-image-btn');
+		showNextImageBtn.setAttribute('disabled', true);
+
+		const articleImages = document.querySelector('#article-images');
+		await queryMediaWikiAPIImageList();
+		const fileName = window.mediaWikiAPIResponseImageList.shift();
+		if (!fileName) {
+			document.querySelector('#show-next-image-btn').setAttribute('disabled', true);
+			document.querySelector('#show-all-images-btn').setAttribute('disabled', true);
+			articleImages.innerHTML = '<p class="err">この記事にはこれ以上画像がありません.</p>';
+			return;
+		}
+		const img = document.createElement('img');
+		img.src = `${(new URL(thisU)).origin}/wiki/Special:FilePath/${(fileName)}?height=1000&width=1000`;
+		img.className = 'article-image';
+		articleImages.appendChild(img);
+
+		// cooldown
+		let count = 5;
+		showNextImageBtn.textContent = '次を表示 (' + count + ')';
+		const interval = setInterval(() => {
+			count--;
+			showNextImageBtn.textContent = '次を表示 (' + count + ')';
+			if (count <= 0) {
+				clearInterval(interval);
+				showNextImageBtn.removeAttribute('disabled');
+				showNextImageBtn.textContent = '次を表示';
+			}
+		}, 1000);
+	});
+	document.querySelector('#show-all-images-btn').addEventListener('click', async (e) => {
+		const articleImages = document.querySelector('#article-images');
+		await queryMediaWikiAPIImageList();
+		for (const image of window.mediaWikiAPIResponseImageList) {
+			const img = document.createElement('img');
+			img.src = `${new URL(thisU).origin}/wiki/Special:FilePath/${image}?height=1000&width=1000`;
+			img.className = 'article-image';
+			articleImages.appendChild(img);
+		}
+		document.querySelector('#show-next-image-btn').setAttribute('disabled', true);
+		document.querySelector('#show-all-images-btn').setAttribute('disabled', true);
+	});
+
 	document.querySelector('#copy-answer-btn').addEventListener('click', (e) => {
 		e.preventDefault();
 		const copyAnswer = document.querySelector('#copy-answer');
