@@ -83,6 +83,11 @@ legend h2, legend h3 {
     cursor: not-allowed;
 }
 
+.app {
+    margin: 0 auto;
+    width: fit-content;
+}
+
 .app>li {
     margin: 50px 0;
 }
