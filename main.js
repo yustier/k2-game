@@ -328,6 +328,15 @@ async function checkGuess(e) {
 	document.querySelector('#guess-input').focus();
 }
 
+function surrender(e) { // asyncじゃないよ
+	e.preventDefault();
+	const p = document.createElement('p');
+	p.className = 'err';
+	p.textContent = 'あなたは降参しました. (' + getTime() + ')';
+	document.querySelector('#guess-history').appendChild(p);
+	document.querySelector('#answer-area').removeAttribute('hidden');
+}
+
 async function writeMlt() {
 	const mlt = document.querySelector('#mlt');
 	mlt.innerHTML = '';
@@ -507,6 +516,7 @@ async function init() {
 	});
 
 	document.querySelector('#guess-btn').addEventListener('click', checkGuess);
+	document.querySelector('#surrender-btn').addEventListener('click', surrender);
 
 	document.querySelector('#copy-answer-btn').addEventListener('click', (e) => {
 		e.preventDefault();
