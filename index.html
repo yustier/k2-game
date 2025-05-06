@@ -96,13 +96,12 @@
 		</li>
 		<li id="guess-area">
 			<p><b>問題.</b>&emsp;この記事の名前はなんでしょう?</p>
-			<form class="guess" name="guess">
+			<form class="guess" name="guess" onsubmit="checkGuess(event)">
 				<label for="guess-input">解答欄:</label>
-				<input id="guess-input" type="text" name="guess" value="" placeholder="答えを入力してください">
+				<input id="guess-input" type="text" name="guess" placeholder="答えを入力してください">
 				<input type="button" id="guess-btn" value="答え合わせ">
 			</form>
-			<p class="err">誤答のメッセージ</p>
-			<p class="good">正解のメッセージ</p>
+			<div id="guess-history"></div>
 			<p><b>注意.</b>&emsp;このアプリを使ってK2ゲームを遊ぶ場合,</p>
 			<ul>
 				<li><p>他の解答者の誤答の履歴を見ることはできません.</p></li>
@@ -112,7 +111,7 @@
 		</li>
 		<li id="answer-area">
 			<p>上の問題の正解は以下のうちのどれか及びそれらの表記ゆれです:</p>
-			<ul id="answers"></ul>
+			<ul id="answer-list"></ul>
 			<div class="copyarea">
 				<textarea id="copy-answer" class="copy-text" name="copy"></textarea>
 				<button id="copy-answer-btn">クリップボードにコピー</button>

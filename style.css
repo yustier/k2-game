@@ -79,6 +79,10 @@ legend h2, legend h3 {
     cursor: pointer;
 }
 
+.form-config input[disabled] {
+    cursor: not-allowed;
+}
+
 .app>li {
     margin: 50px 0;
 }
@@ -171,7 +175,7 @@ legend h2, legend h3 {
     background-color: var(--bg-2);
 }
 
-#answers {
+#answer-list {
     margin: 1em;
 }
 

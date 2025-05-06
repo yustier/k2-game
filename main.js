@@ -290,6 +290,27 @@ async function getCurid() {
 	return page.pageid;
 }
 
+async function checkGuess(e) {
+	e.preventDefault();
+	const guess = document.querySelector('#guess-input').value.replace(/_/g, ' ');
+	const answers = await getAllAnswers();
+	if (answers.includes(guess)) {
+		const p = document.createElement('p');
+		p.className = 'good';
+		p.textContent = '正解です! (' + getTime() + ' あなたの解答: ' + guess + ')';
+		document.querySelector('#guess-history').appendChild(p);
+		document.querySelector('#answer-area').removeAttribute('hidden');
+	} else if (guess === '') {
+	} else {
+		const p = document.createElement('p');
+		p.className = 'err';
+		p.textContent = '不正解です. (' + getTime() + ' あなたの解答: ' + guess + ')';
+		document.querySelector('#guess-history').appendChild(p);
+	}
+	document.querySelector('#guess-input').value = '';
+	document.querySelector('#guess-input').focus();
+}
+
 async function writeMlt() {
 	const mlt = document.querySelector('#mlt');
 	mlt.innerHTML = '';
@@ -331,7 +352,7 @@ async function writeMlt() {
 }
 
 async function writeAnswers() {
-	const answersUl = document.querySelector('#answers');
+	const answersUl = document.querySelector('#answer-list');
 	const pageTitle = await getArticleTitle();
 	const firstLi = document.createElement('li');
 	const firstLiText = document.createElement('span');
@@ -464,6 +485,8 @@ async function init() {
 		document.querySelector('#show-all-images-btn').setAttribute('disabled', true);
 	});
 
+	document.querySelector('#guess-btn').addEventListener('click', checkGuess);
+
 	document.querySelector('#copy-answer-btn').addEventListener('click', (e) => {
 		e.preventDefault();
 		const copyAnswer = document.querySelector('#copy-answer');
@@ -489,6 +512,11 @@ async function init() {
 		});
 	});
 
+	if (new URLSearchParams(new URL(location.href).search).has('secret')) {
+		document.querySelector('#k2').setAttribute('disabled', true);
+		document.querySelector('#image-quiz').setAttribute('disabled', true);
+	}
+
 	restoreRulesOpenState();
 
 	if (thisParams.has('mode')) {
@@ -498,16 +526,17 @@ async function init() {
 		document.forms['select-game'].elements['game'].value = thisParams.get('game');
 	}
 
-	document.querySelector('#no-js').setAttribute('hidden', true);
+	document.querySelector('#no-js').textContent = '問い合わせ中...';
 
 	if (!thisU) {
+		document.querySelector('#no-js').setAttribute('hidden', true);
 		showMainApp();
 		return;
 	}
 
 	await setArticleUrlByTitle();
 
-	showMainApp(); // 開発中はここで表示しておく
+	// showMainApp(); // 開発中はここで表示しておく
 	// return; // コード編集前にreturnせよ
 
 	// ここまではクエリしなくてよい操作
@@ -517,11 +546,9 @@ async function init() {
 	// ここからクエリが必要な操作 (await)
 
 	await writeMlt();
-	if (document.forms['select-mode'].elements['mode'].value === 'set') {
-		await writeAnswers();
-	}
+	await writeAnswers();
 
-	// 全部終わったら表示する
+	document.querySelector('#no-js').setAttribute('hidden', true);
 	showMainApp();
 }
 
