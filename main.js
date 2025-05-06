@@ -1,5 +1,11 @@
 const thisUrl = new URL(location.href);
-const thisParams = new URLSearchParams(thisUrl.search);
+let thisParams = new URLSearchParams(thisUrl.search);
+if (thisParams.has('secret')) {
+	const secret = decodeURIComponent(thisParams.get('secret'));
+	thisParams.delete('secret');
+	const decoded = atob(secret.replace(/-/g, '+').replace(/_/g, '/'));
+	thisParams = new URLSearchParams(decodeURIComponent(decoded));
+}
 const thisUrlBase = location.href.split('?')[0];
 // const thisUrlBase = thisUrl.origin + thisUrl.pathname; // どちらでもよい
 const thisU = decodeURIComponent(thisParams.get('u') || '');
@@ -331,6 +337,9 @@ async function writeAnswers() {
 	const firstLiText = document.createElement('span');
 	firstLiText.className = 'article-name';
 	firstLiText.textContent = pageTitle;
+	for (const e of document.querySelectorAll('.article-name')) {
+		e.textContent = pageTitle;
+	}
 	firstLi.appendChild(firstLiText);
 	answersUl.appendChild(firstLi);
 
@@ -365,16 +374,29 @@ async function writeAnswers() {
 	const lines = copyAnswerText.split('\n').length;
 	copyAnswer.style.height = 1.2 * lines + 'em';
 
-	for (const e of document.querySelectorAll('.article-name')) {
-		e.textContent = pageTitle;
-	}
+	const params = new URLSearchParams(thisParams.toString());
+	params.delete('u');
+	params.set('u', `${new URL(thisU).origin}/?curid=${curid}`);
+	params.set('mode', 'play');
+	const paramsText = params.toString();
+	const secret = encodeURIComponent(btoa(paramsText).replace(/\+/g, '-').replace(/\//g, '_'));
+	const copyLink = document.querySelector('#copy-link');
+	copyLink.textContent = new URL(location.href).origin + '/?secret=' + secret;
 }
 
 // MARK: Main
 
 async function init() {
-	document.forms['select-mode'].addEventListener('change', updateShownParts);
-	document.forms['select-game'].addEventListener('change', updateShownParts);
+	document.forms['select-mode'].addEventListener('change', () => {
+		thisParams.set('mode', document.forms['select-mode'].elements['mode'].value);
+		location.href = thisUrlBase + '?' + thisParams.toString();
+		updateShownParts();
+	});
+	document.forms['select-game'].addEventListener('change', () => {
+		thisParams.set('game', document.forms['select-game'].elements['game'].value);
+		location.href = thisUrlBase + '?' + thisParams.toString();
+		updateShownParts();
+	});
 
 	document.querySelector('#set-article-btn').addEventListener('click', (e) => {
 		e.preventDefault();
@@ -388,7 +410,7 @@ async function init() {
 		updateArticleUrl();
 	});
 
-	document.querySelector('#show-next-image-btn').addEventListener('click', async (e) => {
+	document.querySelector('#show-next-image-btn').addEventListener('click', async () => {
 		const showNextImageBtn = document.querySelector('#show-next-image-btn');
 		showNextImageBtn.setAttribute('disabled', true);
 
@@ -406,6 +428,12 @@ async function init() {
 		img.className = 'article-image';
 		articleImages.appendChild(img);
 
+		if (window.mediaWikiAPIResponseImageList.length === 0) {
+			document.querySelector('#show-next-image-btn').setAttribute('disabled', true);
+			document.querySelector('#show-all-images-btn').setAttribute('disabled', true);
+			return;
+		}
+
 		// cooldown
 		let count = 5;
 		showNextImageBtn.textContent = '次を表示 (' + count + ')';
@@ -419,14 +447,18 @@ async function init() {
 			}
 		}, 1000);
 	});
-	document.querySelector('#show-all-images-btn').addEventListener('click', async (e) => {
+	document.querySelector('#show-all-images-btn').addEventListener('click', async () => {
 		const articleImages = document.querySelector('#article-images');
 		await queryMediaWikiAPIImageList();
-		for (const image of window.mediaWikiAPIResponseImageList) {
-			const img = document.createElement('img');
-			img.src = `${new URL(thisU).origin}/wiki/Special:FilePath/${image}?height=1000&width=1000`;
-			img.className = 'article-image';
-			articleImages.appendChild(img);
+		if (window.mediaWikiAPIResponseImageList.length === 0) {
+			articleImages.innerHTML = '<p class="err">この記事には画像がありません.</p>';
+		} else {
+			for (const image of window.mediaWikiAPIResponseImageList) {
+				const img = document.createElement('img');
+				img.src = `${new URL(thisU).origin}/wiki/Special:FilePath/${image}?height=1000&width=1000`;
+				img.className = 'article-image';
+				articleImages.appendChild(img);
+			}
 		}
 		document.querySelector('#show-next-image-btn').setAttribute('disabled', true);
 		document.querySelector('#show-all-images-btn').setAttribute('disabled', true);
@@ -458,6 +490,14 @@ async function init() {
 	});
 
 	restoreRulesOpenState();
+
+	if (thisParams.has('mode')) {
+		document.forms['select-mode'].elements['mode'].value = thisParams.get('mode');
+	}
+	if (thisParams.has('game')) {
+		document.forms['select-game'].elements['game'].value = thisParams.get('game');
+	}
+
 	document.querySelector('#no-js').setAttribute('hidden', true);
 
 	if (!thisU) {
