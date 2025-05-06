@@ -359,7 +359,11 @@ async function writeAnswers() {
 	firstLiText.className = 'article-name';
 	firstLiText.textContent = pageTitle;
 	for (const e of document.querySelectorAll('.article-name')) {
-		e.textContent = pageTitle;
+		if (thisParams.has('mode') && thisParams.get('mode') === 'play') {
+			e.textContent = '当該記事';
+		} else {
+			e.textContent = pageTitle;
+		}
 	}
 	firstLi.appendChild(firstLiText);
 	answersUl.appendChild(firstLi);
