@@ -235,12 +235,29 @@ async function queryMediaWikiAPIImageList() {
 	const images = data.parse.images;
 	const wikitext = data.parse.wikitext['*'];
 
-	const imageList = [];
+	const foundImages = [];
+
 	for (const image of images) {
-		if (wikitext.includes(image.replace(/_/g, ' '))) {
-			imageList.push(image);
+		imageWithSpace = image.replace(/_/g, ' ');
+
+		let firstPos = Number.MAX_SAFE_INTEGER;
+		for (const ptrn of [image, imageWithSpace]) {
+			const pos = wikitext.indexOf(ptrn);
+			if (pos !== -1 && pos < firstPos) {
+				firstPos = pos;
+			}
+		}
+
+		if (firstPos !== Number.MAX_SAFE_INTEGER) { // if found
+			foundImages.push({
+				image: image,
+				pos: firstPos,
+			});
 		}
 	}
+
+	foundImages.sort((a, b) => a.pos - b.pos);
+	const imageList = foundImages.map((e) => e.image);
 	return imageList;
 }
 
