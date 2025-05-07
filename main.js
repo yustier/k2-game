@@ -410,10 +410,11 @@ async function writeAnswers() {
 			copyAnswerText += ': ' + pageTitle + ' または ' + redirects[0] + '\n';
 			break;
 		default:
-			copyAnswerText += 'は次のいずれか:\n';
-			for (const answer of [pageTitle, ...redirects]) {
-				copyAnswerText += '- ' + answer + '\n';
-			}
+			// copyAnswerText += 'は次のいずれか:\n';
+			// for (const answer of [pageTitle, ...redirects]) {
+			// 	copyAnswerText += '- ' + answer + '\n';
+			// }
+			copyAnswerText += ': ' + pageTitle + ' など\n';
 			break;
 	}
 	const curid = await getCurid();
