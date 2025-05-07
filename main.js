@@ -432,7 +432,7 @@ async function writeAnswers() {
 	const paramsText = params.toString();
 	const secret = encodeURIComponent(btoa(paramsText).replace(/\+/g, '-').replace(/\//g, '_'));
 	const copyLink = document.querySelector('#copy-link');
-	copyLink.textContent = new URL(location.href).origin + '/?secret=' + secret;
+	copyLink.textContent = thisUrlBase + '/?secret=' + secret;
 }
 
 // MARK: Main
