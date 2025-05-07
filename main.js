@@ -565,20 +565,30 @@ async function init() {
 		return;
 	}
 
-	await setArticleUrlByTitle();
-
 	// showMainApp(); // 開発中はここで表示しておく
 	// return; // コード編集前にreturnせよ
 
 	// ここまではクエリしなくてよい操作
-	window.mediaWikiAPIResponseMlt = await queryMediaWikiAPIMlt();
-	window.mediaWikiAPIResponseRedirects = await queryMediaWikiAPIRedirects();
-	window.mediaWikiAPIResponseImageList = await queryMediaWikiAPIImageList();
+	try {
+		await setArticleUrlByTitle();
+		window.mediaWikiAPIResponseRedirects = await queryMediaWikiAPIRedirects();
+		window.mediaWikiAPIResponseMlt = await queryMediaWikiAPIMlt();
+		window.mediaWikiAPIResponseImageList = await queryMediaWikiAPIImageList();
+	} catch (e) {
+		console.error(e);
+		const setArticleResult = document.querySelector('#set-article-result');
+		setArticleResult.className = 'err';
+		setArticleResult.textContent = '有効なMediaWikiの記事URLを指定してください。';
+		document.querySelector('#no-js').setAttribute('hidden', true);
+		showMainApp();
+		return;
+	}
 	// ここからクエリが必要な操作 (await)
 
 	await writeMlt();
 	await writeAnswers();
 
+	// ページを表示
 	document.querySelector('#no-js').setAttribute('hidden', true);
 	showMainApp();
 }
