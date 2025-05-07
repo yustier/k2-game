@@ -585,7 +585,15 @@ async function init() {
 	}
 	// ここからクエリが必要な操作 (await)
 
-	await writeMlt();
+	try {
+		await writeMlt();
+	} catch (e) {
+		console.error(e);
+		const err = document.createElement('p');
+		err.className = 'err';
+		err.textContent = 'このWikiには関連ページ機能がありません。';
+		document.querySelector('#quiz-k2').appendChild(err);
+	}
 	await writeAnswers();
 
 	// ページを表示
