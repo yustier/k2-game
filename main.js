@@ -264,13 +264,12 @@ async function queryMediaWikiAPIImageList() {
 // MARK: Async
 
 async function setArticleUrlByTitle() {
-	const articleUrl = document.querySelector('#article-url');
-	if (new URL(thisU).searchParams.has('curid')) {
-		const curid = new URL(thisU).searchParams.get('curid');
+	setArticleUrl(thisU);
+	const urlThisU = new URL(thisU);
+	if (urlThisU.searchParams.has('curid')) {
+		const curid = urlThisU.searchParams.get('curid');
 		const pageTitle = await queryMediaWikiAPIPagename(curid);
-		setArticleUrl(new URL(thisU).origin + '/wiki/' + pageTitle);
-	} else {
-		setArticleUrl(thisU);
+		setArticleUrl(urlThisU.origin + '/wiki/' + pageTitle);
 	}
 }
 
