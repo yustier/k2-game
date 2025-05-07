@@ -471,7 +471,10 @@ async function init() {
 		if (!fileName) {
 			document.querySelector('#show-next-image-btn').setAttribute('disabled', true);
 			document.querySelector('#show-all-images-btn').setAttribute('disabled', true);
-			articleImages.innerHTML = '<p class="err">この記事にはこれ以上画像がありません.</p>';
+			const err = document.createElement('p');
+			err.className = 'err';
+			err.textContent = 'この記事には画像がありません.';
+			document.querySelector('#quiz-image-quiz').appendChild(err);
 			return;
 		}
 		const img = document.createElement('img');
@@ -502,7 +505,10 @@ async function init() {
 		const articleImages = document.querySelector('#article-images');
 		await queryMediaWikiAPIImageList();
 		if (window.mediaWikiAPIResponseImageList.length === 0) {
-			articleImages.innerHTML = '<p class="err">この記事には画像がありません.</p>';
+			const err = document.createElement('p');
+			err.className = 'err';
+			err.textContent = 'この記事には画像がありません.';
+			document.querySelector('#quiz-image-quiz').appendChild(err);
 		} else {
 			for (const image of window.mediaWikiAPIResponseImageList) {
 				const img = document.createElement('img');
@@ -576,9 +582,10 @@ async function init() {
 		window.mediaWikiAPIResponseImageList = await queryMediaWikiAPIImageList();
 	} catch (e) {
 		console.error(e);
-		const setArticleResult = document.querySelector('#set-article-result');
-		setArticleResult.className = 'err';
-		setArticleResult.textContent = '有効なMediaWikiの記事URLを指定してください。';
+		const err = document.createElement('p');
+		err.className = 'err';
+		err.textContent = '有効なMediaWikiの記事URLを指定してください。';
+		document.querySelector('#set-article').appendChild(err);
 		document.querySelector('#no-js').setAttribute('hidden', true);
 		showMainApp();
 		return;
