@@ -18,7 +18,7 @@ function restoreRulesOpenState() {
 	localStorage.getItem('rules-open') === 'true' ? rulesDetails.open = true : rulesDetails.open = false;
 
 	rulesDetails.addEventListener('toggle', () => {
-	  localStorage.setItem('rules-open', rulesDetails.open);
+		localStorage.setItem('rules-open', rulesDetails.open);
 	});
 }
 
@@ -210,6 +210,50 @@ async function queryMediaWikiAPIRedirects() {
 	return data;
 }
 
+async function queryMediaWikiDisambiguation() {
+	// MediaWiki API を呼び出して, 曖昧さ回避ページの一覧を取得する.
+	// 詳細: https://www.mediawiki.org/wiki/API:Linkshere
+
+	const requestParams = {
+		origin: '*',
+		format: 'json',
+
+		action: 'query',
+			list: 'search',
+				srnamespace: 0,
+				srlimit: 'max',
+	};
+
+	const targetUrl = new URL(thisU);
+	const domain = targetUrl.hostname;
+	const apiUrl = `https://${domain}/w/api.php`;
+
+	let pageTitle;
+	if (targetUrl.searchParams.has('curid')) {
+		pageTitle = await queryMediaWikiAPIPagename(targetUrl.searchParams.get('curid'));
+	} else {
+		const path = targetUrl.pathname;
+		const pageTitleUrl = path.substring(path.indexOf('/wiki/') + 6);
+		pageTitle = decodeURIComponent(pageTitleUrl);
+	}
+	const searchQuery = `linksto:"${pageTitle}" incategory:"曖昧さ回避" OR hastemplate:"Otheruses" OR hastemplate:"Otheruseslist" OR hastemplate:"Otheruses2" OR hastemplate:"For" OR hastemplate:"Other people" OR hastemplate:"Other ships" OR hastemplate:"混同" OR hastemplate:"簡易区別" OR hastemplate:"別人"`;
+	/**
+	 *  現状だとこの方式は使えないっぽい.
+	 *
+	 *  AND and OR do not interact predictably with special keywords (like
+	 *  insource: or hastemplate:) or with namespaces (like Talk: or User:)
+	 *  and probably should not be used in conjunction with either.
+	 *
+	 *  詳細: https://www.mediawiki.org/wiki/Help:CirrusSearch/Logical_operators
+	 */
+	requestParams.srsearch = searchQuery;
+
+	const response = await fetch(apiUrl + '?' + new URLSearchParams(requestParams));
+	const data = await response.json();
+
+	return data;
+}
+
 async function queryMediaWikiAPIImageList() {
 	// MediaWiki API を呼び出して, 記事内の画像一覧を取得する.
 	// 詳細: https://www.mediawiki.org/wiki/API:Parsing_wikitext
@@ -297,6 +341,63 @@ async function getAllRedirects() {
 		redirects.push(redirect.title);
 	}
 	return redirects;
+}
+
+async function getAllDisambiguation() {
+	return; // TODO: この関数は書きかけ. というか, 書き直し中で, 処理が大幅に変わる予定. 詳細は queryMediaWikiDisambiguation() も参照せよ.
+
+	const data = await window.mediaWikiAPIResponseDisambiguation;
+
+	const pages = data.query ? data.query.pages : {};
+	const results = [];
+
+	// 対象テンプレート名（"Template:"は除去して比較）
+	const otherTemplates = [
+		"Otheruses",
+		"Otheruseslist",
+		"Otheruses2",
+		"For",
+		"Other people",
+		"Other ships",
+		"混同",
+		"簡易区別",
+		"別人"
+	];
+
+	for (const pageId in pages) {
+		const page = pages[pageId];
+		let isDisambiguation = false;
+
+		// まずカテゴリ情報でチェック（{{Aimai}}はCategory:曖昧さ回避で判別）
+		if (page.categories) {
+			for (const cat of page.categories) {
+				if (cat.title === "Category:曖昧さ回避") {
+					isDisambiguation = true;
+					break;
+				}
+			}
+		}
+
+		// カテゴリに当てはまらなかったらテンプレート呼び出しの引数をチェック
+		if (!isDisambiguation && page.templates) {
+			for (const tmpl of page.templates) {
+				const tmplName = tmpl.title.replace(/^Template:/, '').trim();
+				if (otherTemplates.includes(tmplName)) {
+					isDisambiguation = true;
+					break;
+				}
+			}
+		}
+
+		if (isDisambiguation) {
+			results.push({
+				pageid: page.pageid,
+				title: page.title
+			});
+		}
+	}
+
+	return results;
 }
 
 async function getAllAnswers() {
@@ -592,6 +693,7 @@ async function init() {
 	try {
 		await setArticleUrlByTitle();
 		window.mediaWikiAPIResponseRedirects = await queryMediaWikiAPIRedirects();
+		// window.mediaWikiAPIResponseDisambiguation = await queryMediaWikiDisambiguation();
 		window.mediaWikiAPIResponseMlt = await queryMediaWikiAPIMlt();
 		window.mediaWikiAPIResponseImageList = await queryMediaWikiAPIImageList();
 	} catch (e) {
