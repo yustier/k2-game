@@ -450,7 +450,8 @@ async function writeAnswers() {
 async function init() {
 	document.forms['select-mode'].addEventListener('change', () => {
 		thisParams.set('mode', document.forms['select-mode'].elements['mode'].value);
-		if (thisParams.get('mode') === 'set') {
+		// モードをsetに変更した場合shareパラメータを剥がす
+		if (thisParams.get('mode') === 'set' && thisParams.has('share')) {
 			thisParams.delete('share');
 		}
 		location.href = thisUrlBase + '?' + thisParams.toString();
