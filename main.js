@@ -39,7 +39,13 @@ async function updateArticleUrl() {
 	}
 	const url = articleUrl.value || articleUrl.placeholder;
 	thisParams.set('u', url);
-	location.href = thisUrlBase + '?' + thisParams.toString();
+	const mode = document.forms['select-mode'].elements['mode'].value;
+	if (mode === 'play') {
+		const secret = encodeURIComponent(btoa(thisParams.toString()).replace(/\+/g, '-').replace(/\//g, '_'));
+		location.href = thisUrlBase + '?secret=' + secret;
+	} else {
+		location.href = thisUrlBase + '?' + thisParams.toString();
+	}
 	if (thisUrl === location.href) {
 		location.reload();
 	}
@@ -427,8 +433,12 @@ async function writeAnswers() {
 
 	const params = new URLSearchParams(thisParams.toString());
 	params.delete('u');
+	if (params.has('share')) {
+		params.delete('share');
+	}
 	params.set('u', `${new URL(thisU).origin}/?curid=${curid}`);
 	params.set('mode', 'play');
+	params.set('share', '1');
 	const paramsText = params.toString();
 	const secret = encodeURIComponent(btoa(paramsText).replace(/\+/g, '-').replace(/\//g, '_'));
 	const copyLink = document.querySelector('#copy-link');
@@ -440,6 +450,9 @@ async function writeAnswers() {
 async function init() {
 	document.forms['select-mode'].addEventListener('change', () => {
 		thisParams.set('mode', document.forms['select-mode'].elements['mode'].value);
+		if (thisParams.get('mode') === 'set') {
+			thisParams.delete('share');
+		}
 		location.href = thisUrlBase + '?' + thisParams.toString();
 		updateShownParts();
 	});
@@ -549,7 +562,7 @@ async function init() {
 		});
 	});
 
-	if (new URLSearchParams(new URL(location.href).search).has('secret')) {
+	if (thisParams.has('share') && thisParams.get('share') === '1') {
 		document.querySelector('#k2').setAttribute('disabled', true);
 		document.querySelector('#image-quiz').setAttribute('disabled', true);
 	}
