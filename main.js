@@ -110,8 +110,8 @@ async function queryMediaWikiAPIRandom() {
 
 	const response = await fetch(apiUrl + '?' + new URLSearchParams(requestParams));
 	const data = await response.json();
-	const pageTitle = data.query.random[0].title;
-	return `https://${domain}/wiki/${pageTitle}`;
+	const pageId = data.query.random[0].id;
+	return `https://${domain}/?curid=${pageId}`;
 }
 
 async function queryMediaWikiAPIPagename(curid) {
